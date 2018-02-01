@@ -37,3 +37,6 @@ The application uses the following views to calculate the percentage of the fail
 "create or replace view daily_requests as
     select l.time::date as day, count(l.status) as requests
     from log l group by day order by day"
+    
+## Result
+![Program output example](https://github.com/claudiu-onica/logs-analysis/blob/master/log_result.png)
