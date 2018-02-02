@@ -17,7 +17,7 @@ def fetch_data(select_str):
         select_str {string} -- psql query to be executed
 
     Returns:
-        [type] -- [description]
+        list -- list of tuples containig the results of the query
     """
     db = psycopg2.connect(database=DBNAME)
     c = db.cursor()
@@ -38,15 +38,17 @@ def create_view(view):
     """
 
     ret = True
-    db = psycopg2.connect(database=DBNAME)
-    c = db.cursor()
+    db = None
     try:
+        db = psycopg2.connect(database=DBNAME)
+        c = db.cursor()
         c.execute(view)
         db.commit()
-    except:
-        print('Error creating the view!')
+    except psycopg2.Error as e:
+        print(e)
         ret = False
-    db.close()
+    if db:
+        db.close()
     return ret
 
 
@@ -59,7 +61,7 @@ def get_popular_articles():
     """
 
     query = """select a.title, count(l.path) as num from articles a, log l where l.path
-            like format(\'%%%s%%\', a.slug) group by a.title
+            = concat('/article/', a.slug) group by a.title
             order by num desc limit 3"""
     res = fetch_data(query)
     articles = "\n".join("%s - %s views" % (article, num)
@@ -75,7 +77,7 @@ def get_popular_authors():
     """
 
     query = """select au.name, count(l.path) as num from articles a, log l, authors au
-            where a.author = au.id and l.path like format('%%%s%%', a.slug)
+            where a.author = au.id and l.path = concat('/article/', a.slug)
             group by au.name order by num desc"""
     res = fetch_data(query)
     authors = "\n".join("%s - %s views" % (author, num) for author, num in res)
@@ -98,7 +100,7 @@ def get_most_errors():
     requests_view = """create or replace view daily_requests as
                     select l.time::date as day, count(l.status) as requests
                     from log l group by day order by day;"""
-    query = """ select to_char(r.day, 'Month DD, YYYY') as day,
+    query = """ select to_char(r.day, 'FMMonth FMDD, YYYY') as day,
                 to_char(e.error_count*100/r.requests::float, 'FM990D9999')
                 as percent
                 from daily_requests r, daily_errors e where r.day = e.day and
@@ -108,9 +110,8 @@ def get_most_errors():
         res = fetch_data(query)
         articles = "\n".join("%s - %s%% errors" % (article, num)
                              for article, num in res)
-        return articles
-    else:
-        return "Error creating views!"
+    return articles
+    
 
 
 def print_logs():
