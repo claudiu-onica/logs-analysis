@@ -18,6 +18,8 @@ logs-analysis is a reporting tool that uses information from 'news' database to 
 
 ## Installation
 * Fork and clone the repository https://github.com/udacity/fullstack-nanodegree-vm
+* Download the 'news' database script from [here](https://github.com/claudiu-onica/logs-analysis/blob/master/newsdata.zip)
+* To load the data, cd into the vagrant directory and use the command `psql -d news -f newsdata.sql`.
 * Clone the repository https://github.com/claudiu-onica/logs-analysis.git into the vagrant folder of your virtual machine
 ## Usage
 In a terminal start the VM.
