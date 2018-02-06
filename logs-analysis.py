@@ -111,7 +111,6 @@ def get_most_errors():
         articles = "\n".join("%s - %s%% errors" % (article, num)
                              for article, num in res)
     return articles
-    
 
 
 def print_logs():
