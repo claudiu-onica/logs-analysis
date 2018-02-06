@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """logs-analysis produces reports based on the data from
-    the database 'news'
+the database 'news'.
 """
 
 import psycopg2
@@ -28,7 +28,7 @@ def fetch_data(select_str):
 
 
 def create_view(view):
-    """create_view - creates the views used to calculate the failed requests
+    """create_view - creates the views used to calculate the failed requests.
 
     Arguments:
         view {string} -- psql CREATE VIEW command
@@ -36,7 +36,6 @@ def create_view(view):
     Returns:
         Boolean -- True if the command succeeded othewise it returns False
     """
-
     ret = True
     db = None
     try:
@@ -53,13 +52,12 @@ def create_view(view):
 
 
 def get_popular_articles():
-    """get_popular_articles returns the most popular three articles of all time
+    """get_popular_articles returns the most popular three articles of all time.
 
     Returns:
         string -- formated string containing the name and number of views
         of the top 3 most popular articles
     """
-
     query = """select a.title, count(l.path) as num from articles a, log l where l.path
             = concat('/article/', a.slug) group by a.title
             order by num desc limit 3"""
@@ -70,12 +68,11 @@ def get_popular_articles():
 
 
 def get_popular_authors():
-    """get_popular_authors returns the most popular article authors of all time
+    """get_popular_authors returns the most popular article authors of all time.
 
     Returns:
         string -- list of the most popular authors
     """
-
     query = """select au.name, count(l.path) as num from articles a, log l, authors au
             where a.author = au.id and l.path = concat('/article/', a.slug)
             group by au.name order by num desc"""
@@ -86,13 +83,12 @@ def get_popular_authors():
 
 def get_most_errors():
     """get_most_errors returns the days on wich more than 1% of requests
-    lead to errors
+    lead to errors.
 
     Returns:
         string -- formated string containing the date and the percentage
-                    of failed requests
+                    of failed requests.
     """
-
     errors_view = """create or replace view daily_errors as
                     select l.time::date as day, count(l.status) as error_count
                     from log l where l.status != '200 OK'
@@ -114,8 +110,7 @@ def get_most_errors():
 
 
 def print_logs():
-    """print_logs prints all three reports
-    """
+    """print_logs prints all three reports."""
     print("\nThe most popular three articles of all time:\n")
     print(get_popular_articles())
     print("\nThe most popular article authors of all time:\n")
